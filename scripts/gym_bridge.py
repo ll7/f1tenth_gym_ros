@@ -21,6 +21,9 @@ import gym
 class GymBridge(object):
     def __init__(self):
         # get params
+
+        self.race_scenario = rospy.get_param('scenario')
+
         self.ego_scan_topic = rospy.get_param('ego_scan_topic')
         self.ego_odom_topic = rospy.get_param('ego_odom_topic')
         self.opp_odom_topic = rospy.get_param('opp_odom_topic')
@@ -57,14 +60,21 @@ class GymBridge(object):
         # init opponent agent
         # TODO: init by params.yaml
         self.opp_agent = PurePursuitAgent(csv_path, wheelbase)
-        initial_state = {'x':[0.0, 2.0], 'y': [0.0, 0.0], 'theta': [0.0, 0.0]}
+        if self.race_scenario == 'single':
+            initial_state = {'x':[0.0, 200.0], 'y': [0.0, 200.0], 'theta': [0.0, 0.0]}
+            self.opp_pose = [200., 0., 0.]
+            self.opp_speed = [0., 0., 0.]
+            self.opp_steer = 0.0
+        else:
+            initial_state = {'x':[0.0, 2.0], 'y': [0.0, 0.0], 'theta': [0.0, 0.0]}
+            self.opp_pose = [2., 0., 0.]
+            self.opp_speed = [0., 0., 0.]
+            self.opp_steer = 0.0
+
         self.obs, _, self.done, _ = self.racecar_env.reset(initial_state)
         self.ego_pose = [0., 0., 0.]
         self.ego_speed = [0., 0., 0.]
         self.ego_steer = 0.0
-        self.opp_pose = [2., 0., 0.]
-        self.opp_speed = [0., 0., 0.]
-        self.opp_steer = 0.0
 
         # keep track of latest sim state
         self.ego_scan = list(self.obs['scans'][0])

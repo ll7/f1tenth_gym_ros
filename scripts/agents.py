@@ -1,7 +1,10 @@
 import numpy as np
 import csv
-from agent_utils import get_actuation, nearest_point_on_trajectory_py2, first_point_on_trajectory_intersecting_circle
+import agent_utils
 
+"""
+Planner classes
+"""
 class Agent(object):
     def __init__(self, csv_path):
         # TODO: load waypoints from csv
@@ -10,7 +13,6 @@ class Agent(object):
         
     def plan(self, obs):
         pass
-
 
 class PurePursuitAgent(Agent):
     def __init__(self, csv_path, wheelbase):
@@ -24,9 +26,9 @@ class PurePursuitAgent(Agent):
 
     def _get_current_waypoint(self, waypoints, lookahead_distance, position, theta):
         wpts = waypoints[:, 0:2]
-        nearest_point, nearest_dist, t, i = nearest_point_on_trajectory_py2(position, wpts)
+        nearest_point, nearest_dist, t, i = agent_utils.nearest_point_on_trajectory_py2(position, wpts)
         if nearest_dist < lookahead_distance:
-            lookahead_point, i2, t2 = first_point_on_trajectory_intersecting_circle(position, lookahead_distance, wpts, i+t, wrap=True)
+            lookahead_point, i2, t2 = agent_utils.first_point_on_trajectory_intersecting_circle(position, lookahead_distance, wpts, i+t, wrap=True)
             if i2 == None:
                 return None
             current_waypoint = np.empty(waypoints[i2, :].shape)
@@ -50,5 +52,38 @@ class PurePursuitAgent(Agent):
         lookahead_point = self._get_current_waypoint(self.waypoints, self.lookahead_distance, position, pose_theta)
         if lookahead_point is None:
             return self.safe_speed, 0.0
-        speed, steering_angle = get_actuation(pose_theta, lookahead_point, position, self.lookahead_distance, self.wheelbase)
+        speed, steering_angle = agent_utils.get_actuation(pose_theta, lookahead_point, position, self.lookahead_distance, self.wheelbase)
         return speed, steering_angle
+
+
+class AdversarialRRTAgent(Agent):
+    def __init__(self, csv_path, wheelbase):
+        super(AdversarialRRTAgent, self).__init__(csv_path)
+        
+    def plan(self, obs):
+        pass
+
+
+class AdversarialFGMAgent(Agent):
+    def __init__(self, csv_path, wheelbase):
+        super(AdversarialFGMAgent, self).__init__(csv_path)
+        
+    def plan(self, obs):
+        pass
+
+
+class AdversarialPPLaneAgent(Agent):
+    def __init__(self, csv_path, wheelbase):
+        super(AdversarialPPLaneAgent, self).__init__(csv_path)
+        
+    def plan(self, obs):
+        pass
+
+
+class StaticAgent(Agent):
+    # Static opponent agent for one car scenario, should be inited outside of map
+    def __init(self):
+        super(StaticAgent, self).__init__(None)
+
+    def plan(self, obs):
+        return 0.0, 0.0
