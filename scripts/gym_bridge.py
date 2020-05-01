@@ -15,11 +15,11 @@ from tf.transformations import quaternion_from_euler
 
 import numpy as np
 
-from agents import PurePursuitAgent
+from agents import PurePursuitAgent, StationaryAgent
 
 import gym
 class GymBridge(object):
-    def __init__(self):
+    def __init__(self, spawn_opp = False):
         # get params
         self.ego_scan_topic = rospy.get_param('ego_scan_topic')
         self.ego_odom_topic = rospy.get_param('ego_odom_topic')
@@ -56,7 +56,7 @@ class GymBridge(object):
 
         # init opponent agent
         # TODO: init by params.yaml
-        self.opp_agent = PurePursuitAgent(csv_path, wheelbase)
+        self.opp_agent = PurePursuitAgent(csv_path, wheelbase) if spawn_opp else StationaryAgent(csv_path, wheelbase)
         initial_state = {'x':[0.0, 2.0], 'y': [0.0, 0.0], 'theta': [0.0, 0.0]}
         self.obs, _, self.done, _ = self.racecar_env.reset(initial_state)
         self.ego_pose = [0., 0., 0.]

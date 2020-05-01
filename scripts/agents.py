@@ -11,6 +11,12 @@ class Agent(object):
     def plan(self, obs):
         pass
 
+class StationaryAgent(Agent):
+    def __init__(self, csv_path, wheelbase):
+        super(StationaryAgent, self).__init__(csv_path)
+
+    def plan(self, obs):
+        return 0., 0.
 
 class PurePursuitAgent(Agent):
     def __init__(self, csv_path, wheelbase):
