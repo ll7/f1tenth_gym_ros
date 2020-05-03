@@ -14,7 +14,6 @@ from tf2_ros import transform_broadcaster
 from tf.transformations import quaternion_from_euler
 
 import numpy as np
-
 from agents import PurePursuitAgent, StationaryAgent
 
 import gym
