@@ -7,10 +7,10 @@ from scipy import stats
 import pdb
 
 #SET DEBUGMODE = True to see cv2 output
-DEBUGMODE = False
+DEBUGMODE = True
 
 #FILL THIS IN
-origin_world = [1345.0, 3110.0, 100.0]
+origin_world = [1343.0, 3104.0, 131.0]
 
 filepath = "../maps/unreal_map.png"
 input_map = cv2.imread(filepath)
