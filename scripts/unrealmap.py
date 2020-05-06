@@ -8,19 +8,47 @@ import pdb
 
 #SET DEBUGMODE = True to see cv2 output
 DEBUGMODE = True
+clicks = []
+img = None
 
-#FILL THIS IN
+def draw_circle(event, x, y, flags, params):
+    global clicks
+    if event == cv2.EVENT_LBUTTONDBLCLK:
+        print(x, y)
+        cv2.circle(img, (x,y), 3,(150, 0,0),-1)
+        clicks.append((x, y))
+
+def get2clicks(in_img):
+    global clicks
+    global img
+    clicks = []
+    img = in_img
+    while True:
+        cv2.imshow('UnrealMap', in_img)
+        cv2.waitKey(1)
+        if len(clicks) >=2:
+            break
+    x1, y1 = clicks[0]
+    x2, y2 = clicks[1]
+    
+    return x1, x2, y1, y2
+
+#FILL THIS IN EVERYTIME
 origin_world = [1343.0, 3104.0, 131.0]
 
 filepath = "../maps/unreal_map.png"
 input_map = cv2.imread(filepath)
+input_map = input_map[30:, :, :]
 bg_rgb = np.array([35, 35, 35])
 bg = cv2.inRange(input_map, bg_rgb, bg_rgb)
+cv2.namedWindow('UnrealMap')
+cv2.setMouseCallback('UnrealMap', draw_circle)
 
 # Get length of line
 #TODO: Get line_crop coordinates from mouseclick
-line_crop_bw = bg[1000:1040, 70:120]
-line_crop_rgb = input_map[1000:1040, 70:120]
+x_start, x_end, y_start, y_end = get2clicks(input_map)
+line_crop_bw = bg[y_start:y_end, x_start:x_end]
+line_crop_rgb = input_map[y_start:y_end, x_start:x_end]
 fg_idx = np.nonzero(line_crop_bw == 0.)
 y, length = stats.mode(fg_idx[0])
 if DEBUGMODE:
@@ -34,16 +62,18 @@ if DEBUGMODE:
 
 # Get start position coordinates (center of red_square)
 #TODO: Get map_crop coordinates from mouseclick
-map_crop_bw = bg[:900, :]
-map_crop_rgb = input_map[:900, :]
-start_marker_rgb = np.array([0., 0., 166.])
+print("Map Crop Coordinates")
+x_start, x_end, y_start, y_end = get2clicks(input_map)
+map_crop_bw = bg[y_start:y_end, x_start:x_end]
+map_crop_rgb = input_map[y_start:y_end, x_start:x_end]
+start_marker_rgb = np.array([41., 41., 255.])
 red_square_idxs = np.where(map_crop_rgb == start_marker_rgb)
 ry_start, ry_end = red_square_idxs[0][0], red_square_idxs[0][-1]
 rx_start, rx_end = red_square_idxs[1][0], red_square_idxs[1][-1]
 center_y = (ry_start + (ry_end - ry_start) / 2.)
 center_x = (rx_start + (rx_end - rx_start) / 2.)
 if DEBUGMODE:
-    map_crop_rgb[center_y, center_x] = np.array([255., 255., 255.])
+    map_crop_rgb[int(center_y), int(center_x)] = np.array([255., 255., 255.])
     origin_unreal = [center_y, center_x, 0.0]
     print("Click window to continue")
     cv2.imshow("DEBUG start location", map_crop_rgb)
